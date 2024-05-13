@@ -267,11 +267,11 @@
  ==========================================================================================*/
  
 	test = alpha*den - num;
-	int itest;
-	if(std::abs(test) < eps) {
-		alf_gmp.tetra_radius_gmp(a, b, c, d, ra, rb, rc, rd, &itest, alpha);
-		test = itest;
-	}
+	// int itest;
+	// if(std::abs(test) < eps) {
+	// 	alf_gmp.tetra_radius_gmp(a, b, c, d, ra, rb, rc, rd, &itest, alpha);
+	// 	test = itest;
+	// }
  
 /* ==========================================================================================
  	The spectrum for a tetrahedron is [R_t Infinity[. If ALPHA is in

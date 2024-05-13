@@ -5,6 +5,8 @@
 #ifndef TETRAGEOM_H
 #define TETRAGEOM_H
 
+double teteps = 1e-15;
+
 /* ====================================================================
    class
  ==================================================================== */
@@ -184,6 +186,11 @@
 	cosine[3] = det23*val1*val4;
 	cosine[4] = det24*val2*val4;
 	cosine[5] = det34*val3*val4;
+
+	for (int i = 0; i < 6; i++) {
+        if (std::abs(cosine[i] - 1) < teteps) cosine[i] = 1;
+        else if (std::abs(cosine[i] + 1) < teteps) cosine[i] = -1;
+    }
 
 	for(int i = 0; i < 6; i++) {
 		angle[i] = std::acos(cosine[i]);
@@ -493,6 +500,11 @@ double TETRAGEOM::tetra_volume(double r12sq, double r13sq, double r14sq,
 	cosine[4] = det24*val2*val4;
 	cosine[5] = det34*val3*val4;
 
+	for (int i = 0; i < 6; i++) {
+        if (std::abs(cosine[i] - 1) < teteps) cosine[i] = 1;
+        else if (std::abs(cosine[i] + 1) < teteps) cosine[i] = -1;
+    }
+
 	for(int i = 0; i < 6; i++) {
 		angle[i] = std::acos(cosine[i]);
 		sine[i]  = std::sin(angle[i]);
@@ -711,6 +723,11 @@ double TETRAGEOM::tetra_volume(double r12sq, double r13sq, double r14sq,
 	cosine[3] = det23*val1*val4;
 	cosine[4] = det24*val2*val4;
 	cosine[5] = det34*val3*val4;
+
+	for (int i = 0; i < 6; i++) {
+        if (std::abs(cosine[i] - 1) < teteps) cosine[i] = 1;
+        else if (std::abs(cosine[i] + 1) < teteps) cosine[i] = -1;
+    }
 
 	for(int i = 0; i < 6; i++) {
 		angle[i] = std::acos(cosine[i]);
@@ -1178,8 +1195,14 @@ double TETRAGEOM::tetra_volume(double r12sq, double r13sq, double r14sq,
 	rho_bd2 = rb2 - val5b*val5b; rho_cd2 = rc2 - val6b*val6b;
 
 	for(int i = 0; i < 6; i++) {
-		invsin[i] = 1.0/sin_ang[i];
-		cotan[i] = cos_ang[i]*invsin[i];
+		if (std::abs(sin_ang[i]) < teteps) {
+            invsin[i] = 0;
+            cotan[i] = 0;
+        }
+        else {
+            invsin[i] = 1.0/sin_ang[i];
+            cotan[i] = cos_ang[i]*invsin[i];
+        }
 	}
 
 	val_ab = -(cos_abc*cos_abc+cos_abd*cos_abd)*cotan[0]

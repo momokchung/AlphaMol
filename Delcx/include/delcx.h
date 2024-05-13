@@ -165,7 +165,7 @@
 	void mark_zero(std::vector<Tetrahedron>& tetra, int itetra, int ivertex);
 
 	// remove flat tetrahedra
-	void peel(std::vector<Vertex>& vertices, std::vector<Tetrahedron>& tetra);
+	void peel(std::vector<Vertex>& vertices, std::vector<Tetrahedron>& tetra, int *flag);
 
 	// Computes the volume of a tetrahedron
 	double tetra_vol(double *a, double *b, double *c, double *d);
@@ -183,7 +183,7 @@
 	std::stack<int> free;
 	std::vector<int> kill;
 
-	double eps = 1.e-5;
+	double eps = 1e-1;
 
 	int inf4_1[4] = {1, 1, 0, 0};
 	int sign4_1[4] = {-1, 1, 1, -1};
@@ -392,6 +392,8 @@
 			vert.status = 0;
 			vertices.push_back(vert);
 		}
+        delete [] bcoord;
+		delete [] brad;
 	}
 
 /* ====================================================================
@@ -511,7 +513,10 @@
 	Now I peel off flat tetrahedra at the boundary of the DT
  ==================================================================== */
 
-//	peel(vertices, tetra);
+    int flag;
+    do {
+        peel(vertices, tetra, &flag);
+    } while(flag!=0); 
 
 	sos.clear_sos_gmp();
   }
@@ -3230,7 +3235,7 @@
 	of the DT
  ==================================================================== */
 
-  void DELCX::peel(std::vector<Vertex>& vertices, std::vector<Tetrahedron>& tetra)
+  void DELCX::peel(std::vector<Vertex>& vertices, std::vector<Tetrahedron>& tetra, int *flag)
   {
 
 	int ia, ib, ic, id;
@@ -3239,6 +3244,7 @@
 	int ntetra = tetra.size();
 	double coorda[3], coordb[3], coordc[3], coordd[3];
 
+	*flag = 0;
 	for(int i = 0; i < ntetra; i++) {
 
 		if(tetra[i].info[1]==0) continue;
@@ -3272,6 +3278,7 @@
 		if(std::abs(vol) < eps) {
 			sos.minor4_gmp(coorda, coordb, coordc, coordd, &res);
 			if(res == 0) {
+				(*flag)++;
 				tetra[i].info[2] = 1;
 			}
 		}
@@ -3622,6 +3629,16 @@
 		c = (c1+c2+c3)/3;
 		u1 = c2-c1; v1 = c3-c1;
 		w1 = u1^v1;
+        d1 = w1.norm();
+		if(d1==0) {
+			if(u1[0]!=0) {
+				w1[0]=u1[1]; w1[1] = -u1[0]; w1[2] = 0;
+			} else if(u1[1]!=0) {
+				w1[0] = u1[1]; w1[1]= -u1[0]; w1[2]=0;
+			} else {
+				w1[0] = u1[2]; w1[1]= -u1[2]; w1[2]=0;
+			}
+		}
 		d1 = u1.norm(); d2 = v1.norm(); d3 = (c3-c2).norm(); d = std::max(std::max(d1,d2),d3);
 		for(int i = 0; i < 3; i++) {
 			bcoord[i] = c[i] + (2*d+3*Rmax)*w1[i];

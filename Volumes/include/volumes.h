@@ -18,6 +18,8 @@ with respect to the coordinates of the centers of the ball.
 #include "Edge.h"
 #include "Face.h"
 
+double veps = 1e-15;
+
 TETRAGEOM tetrageom;
 GAUSSCORNER gauss;
  
@@ -523,8 +525,10 @@ GAUSSCORNER gauss;
 		vola  = surfa*ra/3;
 		ballwsurf[i]  += coefval*surfa;
 		ballwvol[i]   += coefval*vola;
-		ballwmean[i]  += ballwsurf[i]/ra;
-		ballwgauss[i] += ballwsurf[i]/ra2;
+        if (ra2 > 0) {
+            ballwmean[i]  += ballwsurf[i]/ra;
+            ballwgauss[i] += ballwsurf[i]/ra2;
+        }
 	}
 
 /* ====================================================================
@@ -740,6 +744,8 @@ GAUSSCORNER gauss;
  ==================================================================== */
 
 	cosine = (ra2+rb2-rab2)/(2.0*ra*rb);
+	if (std::abs(cosine - 1) < veps) cosine = 1;
+    else if (std::abs(cosine + 1) < veps) cosine = -1;
 	*phi = std::acos(cosine);
 
 	*l = vala/ra + valb/rb;
@@ -845,6 +851,8 @@ GAUSSCORNER gauss;
  ==================================================================== */
 
 	cosine = (ra2+rb2-rab2)/(2.0*ra*rb);
+	if (std::abs(cosine - 1) < veps) cosine = 1;
+    else if (std::abs(cosine + 1) < veps) cosine = -1;
 	*phi = std::acos(cosine);
 	*l = vala/ra + valb/rb;
 

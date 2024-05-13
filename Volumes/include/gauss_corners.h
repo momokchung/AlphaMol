@@ -6,6 +6,8 @@
 #ifndef GAUSSCORNER_H
 #define GAUSSCORNER_H
 
+double gceps = 1e-15;
+
 /* ====================================================================
    class
  ==================================================================== */
@@ -105,8 +107,12 @@
 	if(std::abs(u) < tol) u = 0.0;
 	double w = std::sqrt(std::abs(u));
 	double t = std::sqrt(v);
+	double wt = w/t;
 
-	double S = 2*std::asin(w/t);
+    if (std::abs(wt - 1) < gceps) wt = 1;
+    else if (std::abs(wt + 1) < gceps) wt = -1;
+
+	double S = 2*std::asin(wt);
 
 	if(option==0) return S;
 
